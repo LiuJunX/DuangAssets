@@ -15,14 +15,15 @@ public class UI_DialogManager : MonoBehaviour {
 	void Awake()
 	{
 		instance = this;
-		if (grayBg.activeSelf)
-			grayBg.SetActive (false);
-		if (centerContent.activeSelf)
-			centerContent.SetActive (false);
+		Close ();
 	}
 
 	public void Close()
 	{
+		if (centerContent.activeSelf)
+			centerContent.SetActive (false);
+		if (grayBg.activeSelf)
+			grayBg.SetActive (false);
 		if (objWin.activeSelf)
 			objWin.SetActive (false);
 		if (objLose.activeSelf)
@@ -31,5 +32,27 @@ public class UI_DialogManager : MonoBehaviour {
 			objNewRecord.SetActive (false);
 	}
 
+	public void Show(Type type)
+	{
+		grayBg.SetActive (true);
+		centerContent.SetActive (true);
+		switch (type) {
+		case Type.Loss:
+			objLose.SetActive(true);
+			break;
+		case Type.Win:
+			objWin.SetActive(true);
+			break;
+		case Type.NewRecord:
+			objNewRecord.SetActive(true);
+			break;
+		}
+	}
+
+	public enum Type{
+		Win,
+		Loss,
+		NewRecord
+	}
 
 }

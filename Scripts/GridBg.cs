@@ -122,7 +122,8 @@ public class GridBg : UniformGrid<GridBgItem>
 			{
 				isGameOver = true;
 				Clock.instance.ClockStop();
-				PersistentData.instance.NewScore(Clock.instance.secends);
+				bool isNewRecord = PersistentData.instance.NewScore(Clock.instance.secends);
+				UI_DialogManager.instance.Show(isNewRecord ? UI_DialogManager.Type.NewRecord : UI_DialogManager.Type.Win);
 				Debug.LogWarning("GAME WIN!!!");
 				Lady.instance.ggText.ShowDefault("恭喜你取得胜利。快点击时间，挑战新的速度极限吧。");
 			}
@@ -170,6 +171,7 @@ public class GridBg : UniformGrid<GridBgItem>
 				mines[i].Show();
 			}
 		}
+		UI_DialogManager.instance.Show (UI_DialogManager.Type.Loss);
 		Lady.instance.ggText.ShowDefault ("你触雷了！！！点击时间再次挑战吧");	
 	}
 
