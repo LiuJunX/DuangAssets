@@ -88,23 +88,20 @@ public class GridBg : UniformGrid<GridBgItem>
 			return;
 		if (isGameOver && curShowMineIndex != -1) {
 			showMineGapTimeCur += Time.deltaTime;
-			if(showMineGapTimeCur <showMineGapTime)
+			if(showMineGapTimeCur < showMineGapTime)
 				return;
 			showMineGapTimeCur = 0;
-			mines[curShowMineIndex ++].Show();
 			while(curShowMineIndex < mineNum)
 			{
 				if(! mines[curShowMineIndex].hasShowed)
 				{
-					mines[curShowMineIndex].Show();
+					mines[curShowMineIndex ++].Show();
 					return;
-				}
+				} else 
+					curShowMineIndex ++;
 			}
-			if(curShowMineIndex == mineNum)
-			{
-				curShowMineIndex = -1;
-				UI_DialogManager.instance.Show (UI_DialogManager.Type.Loss);
-			}
+			curShowMineIndex = -1;
+			UI_DialogManager.instance.Show (UI_DialogManager.Type.Loss);
 			return;
 		}
 

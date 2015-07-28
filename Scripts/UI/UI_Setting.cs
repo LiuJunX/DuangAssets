@@ -12,9 +12,14 @@ public class UI_Setting : MonoBehaviour {
 	public Animator entryButtonAni;	
 	public float speedDeadZone = 0.1f;
 
-	public float damping = 0.3f;
-	
-	public float g = 3f;
+	public float damping;
+	public float damping1 = 0.3f;
+	public float damping2 = 0.2f;
+ 	
+	public float g;
+	public float g1 = 3f;
+	public float g2 = 2f;
+
 	public float beginSpeed = 0;
 	public float speed = 0f;
 	public float beginTime = 0;
@@ -55,7 +60,8 @@ public class UI_Setting : MonoBehaviour {
 				beginTime = Time.realtimeSinceStartup;
 				if (Mathf.Abs (speed) < speedDeadZone)
 					over = true;
-				damping = 0.8f;
+				damping = damping2;
+				g = g2;
 			}
 		} else {
 			if (windowHeightPercentage <= 0.01f) {
@@ -81,6 +87,8 @@ public class UI_Setting : MonoBehaviour {
 		case State.Entering:
 			GridBg.instance.Pause();
 			diffChanged = false;
+			damping = damping1;
+			g = g1;
 			gameObject.SetActive (true);
 			GameManager.instance.SetState(GameManager.State.Setting);
 			damping = 0.2f;
