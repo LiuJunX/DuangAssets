@@ -4,14 +4,14 @@ timeCreated: 1437633893
 licenseType: Pro
 TrueTypeFontImporter:
   serializedVersion: 2
-  fontSize: 50
+  fontSize: 100
   forceTextureCase: -2
   characterSpacing: 1
   characterPadding: 0
   includeFontData: 1
   use2xBehaviour: 0
   fontNames: []
-  customCharacters: 
+  customCharacters: 12
   fontRenderingMode: 0
   userData: 
   assetBundleName: 

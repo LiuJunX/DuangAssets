@@ -94,6 +94,7 @@ public class GridBgItem : GridItem<GridBgItem> {
 		
 		if(this.isFlaged)
 		{
+			GridBg.instance.flagNum --;
 			isFlaged = false;
 			flag.SetActive(isFlaged);
 		}
@@ -144,6 +145,10 @@ public class GridBgItem : GridItem<GridBgItem> {
 			return;
 		isFlaged = ! isFlaged;
 		flag.SetActive (isFlaged);
+		if (isFlaged)
+			GridBg.instance.flagNum ++;
+		else 
+			GridBg.instance.flagNum --;
 	}
 
 	public override void ResetState()

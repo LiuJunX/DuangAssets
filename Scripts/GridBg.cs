@@ -12,11 +12,16 @@ public class GridBg : UniformGrid<GridBgItem>
 	int mouseCol;
 	bool isGameOver;
 	bool paused = false;
+	int curShowMineIndex = -1;
 	Vector2 mousePosWorld;
 	bool isTouchWork = true;
+	float showMineGapTimeCur = 0;
 	GridBgItem[] mines;
 
 	public int mineNum = 0;
+	public int showedNums = 0;
+	public int _flagNum = 0;
+	public float showMineGapTime = 0.08f;
 	public SpriteRenderer outlineStencil;
 	public MyInput myInput = new MyInput();
 
@@ -24,6 +29,16 @@ public class GridBg : UniformGrid<GridBgItem>
 	public float buttomPixels;
 	public float topPercentage;
 	public float buttomPercentage;
+
+	public int flagNum {
+		get{
+			return _flagNum;
+		}
+		set{
+			_flagNum = value;
+			UI_DiffAndMineShower.instance.RefreshFlagNum(_flagNum);
+		}
+	}
 
 	protected override void Awake ()
 	{
@@ -66,12 +81,33 @@ public class GridBg : UniformGrid<GridBgItem>
 
 	}
 
+
     void Update()
     {
 		if (paused) 
 			return;
-		if (isGameOver)
+		if (isGameOver && curShowMineIndex != -1) {
+			showMineGapTimeCur += Time.deltaTime;
+			if(showMineGapTimeCur <showMineGapTime)
+				return;
+			showMineGapTimeCur = 0;
+			mines[curShowMineIndex ++].Show();
+			while(curShowMineIndex < mineNum)
+			{
+				if(! mines[curShowMineIndex].hasShowed)
+				{
+					mines[curShowMineIndex].Show();
+					return;
+				}
+			}
+			if(curShowMineIndex == mineNum)
+			{
+				curShowMineIndex = -1;
+				UI_DialogManager.instance.Show (UI_DialogManager.Type.Loss);
+			}
 			return;
+		}
+
 		myInput.Update ();
 		mousePosWorld = myInput.lastMessage.pos;
 		if (myInput.lastMessage.touchType == MyInput.TouchType.Down) {
@@ -106,7 +142,7 @@ public class GridBg : UniformGrid<GridBgItem>
 		}
 
 	}
-	public int showedNums = 0;
+
 	void Click()
 	{
 		if (showedNums == 0) {
@@ -116,8 +152,6 @@ public class GridBg : UniformGrid<GridBgItem>
 		isTouchWork = false;
 		buffer [mouseRow, mouseCol].Show (true);
 		if (! isGameOver) {
-			Debug.Log("showedNums:" + showedNums);
-			Debug.Log("buffer.Length - mineNum:" + (buffer.Length - mineNum));
 			if(showedNums == buffer.Length - mineNum)
 			{
 				isGameOver = true;
@@ -141,7 +175,9 @@ public class GridBg : UniformGrid<GridBgItem>
 		Clock.instance.Clear ();
 		paused = false;
 		isGameOver = false;
+		flagNum = 0;
 		showedNums = 0;
+		curShowMineIndex = -1;
 		mineNum = ConfigData.GetCurMineNum((DifficultyType)PersistentData.instance.CurDiff());
 		int[] mineIndexes = MyUtility.RandNumsWithoutRepetitionRange (0, buffer.Length, mineNum);
 
@@ -161,17 +197,13 @@ public class GridBg : UniformGrid<GridBgItem>
 	}
 
 
+
 	public void ShowAllMines()
 	{
 		isGameOver = true;
+		curShowMineIndex = 0;
+		showMineGapTimeCur = 0;
 		Clock.instance.ClockStop ();
-		if ((buffer [mouseRow, mouseCol] as GridBgItem).isMine) {
-			for(int i = 0; i < mines.Length; ++i)
-			{
-				mines[i].Show();
-			}
-		}
-		UI_DialogManager.instance.Show (UI_DialogManager.Type.Loss);
 		Lady.instance.ggText.ShowDefault ("你触雷了！！！点击时间再次挑战吧");	
 	}
 

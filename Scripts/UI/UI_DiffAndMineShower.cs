@@ -13,6 +13,7 @@ public class UI_DiffAndMineShower : MonoBehaviour {
 	void Awake()
 	{
 		instance = this;
+		RefreshFlagNum (0);
 		Refresh ();
 	}
 
@@ -30,6 +31,11 @@ public class UI_DiffAndMineShower : MonoBehaviour {
 			break;
 		}
 		minText.text = ConfigData.GetCurMineNum ((DifficultyType)PersistentData.instance.CurDiff()).ToString();
+	}
+
+	public void RefreshFlagNum(int num)
+	{
+		this.flagText.text = num.ToString ();
 	}
 
 }

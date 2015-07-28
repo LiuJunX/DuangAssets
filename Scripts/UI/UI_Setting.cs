@@ -5,46 +5,124 @@ public class UI_Setting : MonoBehaviour {
 
 	public static UI_Setting instance;
 
-	public bool isShowing = false;
-	State state;
-	public Animator entryButtonAni;	
+	public State statePre;
+	public State state;
 
-	public void Show()
+	public bool diffChanged = false;
+	public Animator entryButtonAni;	
+	public float speedDeadZone = 0.1f;
+
+	public float damping = 0.3f;
+	
+	public float g = 3f;
+	public float beginSpeed = 0;
+	public float speed = 0f;
+	public float beginTime = 0;
+	public float passTime = 0;
+	public float beginDis = 0;
+
+	//[0,1]
+	public float windowHeightPercentage = 0f;
+
+
+	RectTransform trans;
+	float deltaAnchorY;
+
+	void Start()
 	{
-		Debug.Log ("show setting");
-		isShowing = true;
-		gameObject.SetActive (true);
-		GameManager.instance.SetState(GameManager.State.Setting);
+		trans = GetComponent<RectTransform> ();
+		deltaAnchorY = trans.anchorMax.y - trans.anchorMin.y;
+		gameObject.SetActive (false);
+		trans.anchorMin = new Vector2 (trans.anchorMin.x, trans.anchorMax.y);
 	}
 
-	public void Close()
+	void Update()
 	{
-		Debug.Log ("close setting");
-		isShowing = false;
-		gameObject.SetActive (false);
-		GridBg.instance.ResetState ();
-		GameManager.instance.SetStateToPreState ();
+		if (state == State.Stay)
+			return;
+
+		bool over = false;
+		passTime = Time.realtimeSinceStartup - beginTime;
+		windowHeightPercentage = beginDis + beginSpeed * passTime + g * passTime * passTime * 0.5f;
+		
+		if (state == State.Entering) {
+			speed = beginSpeed + g * passTime;
+			if (windowHeightPercentage >= 0.99f) {
+				windowHeightPercentage = 1;
+				beginSpeed = - speed * damping;
+				speed = beginSpeed;
+				beginDis = 1;
+				beginTime = Time.realtimeSinceStartup;
+				if (Mathf.Abs (speed) < speedDeadZone)
+					over = true;
+				damping = 0.8f;
+			}
+		} else {
+			if (windowHeightPercentage <= 0.01f) {
+				windowHeightPercentage = 0;
+				over = true;
+			}
+		}
+
+		trans.anchorMin = new Vector2 (trans.anchorMin.x, trans.anchorMax.y - windowHeightPercentage * deltaAnchorY);
+		
+		if (over)
+			SetState (State.Stay);
+
 	}
 
 	public void SetState(State s)
 	{
+		if (state == s)
+			return;
+		this.statePre = state;
 		this.state = s;
 		switch (state) {
 		case State.Entering:
-			Show();
+			GridBg.instance.Pause();
+			diffChanged = false;
+			gameObject.SetActive (true);
+			GameManager.instance.SetState(GameManager.State.Setting);
+			damping = 0.2f;
+			beginDis = 0;
+			g = Mathf.Abs(g);
+			beginSpeed = speed = 0;
+			beginTime = Time.realtimeSinceStartup;
 			break;
 		case State.Stay:
+			if(statePre == State.Exiting)
+			{
+				gameObject.SetActive (false);
+				if(diffChanged)
+					GridBg.instance.ResetState ();
+				GridBg.instance.Resume();
+				GameManager.instance.SetStateToPreState ();
+			}
 			break;
 		case State.Exiting:
-			Close();
+			beginSpeed = speed = 0;
+			g = - Mathf.Abs(g);
+			beginDis = 1;
+			beginTime = Time.realtimeSinceStartup;
 			break;
+		}
+	}
+
+	public void ClickSettingEntry()
+	{
+		if (state == State.Entering || state == State.Exiting)
+			return;
+		if (statePre == State.Entering)
+			SetState (State.Exiting);
+		else {
+			SetState (State.Entering);
 		}
 	}
 
 	public enum State
 	{
-		Entering,
 		Stay,
+		Entering,
 		Exiting
 	}
 

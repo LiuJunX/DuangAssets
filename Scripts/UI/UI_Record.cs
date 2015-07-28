@@ -18,9 +18,9 @@ public class UI_Record : MonoBehaviour {
 	void NewRecord(int newScore)
 	{
 		if (newScore == -1) {
-			text.text = "记录：无记录";
+			text.text = "无记录";
 		} else {
-			text.text = "记录：" + newScore;
+			text.text = "记录:" + newScore;
 		}
 	}
 
