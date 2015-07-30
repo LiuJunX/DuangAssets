@@ -148,7 +148,7 @@ public class GridBgItem : GridItem<GridBgItem> {
 		if (isFlaged)
 			GridBg.instance.flagNum ++;
 		else 
-			GridBg.instance.flagNum --;
+			GridBg.instance.flagNum --;	
 	}
 
 	public override void ResetState()
